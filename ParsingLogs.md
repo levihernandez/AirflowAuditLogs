@@ -76,3 +76,59 @@ logs:
         name: new_log_start_with_date
         pattern: \[\d{4}\-\d{2}\-\d{2}
 ```
+
+
+### Log Patterns - Datadog Pipeline
+
+> Parse the Task log
+
+`Marking task as SUCCESS. dag_id=example_bash_operator, task_id=run_after_loop, execution_date=20210419T171919, start_date=20210419T171923, end_date=20210419T171924`
+
+> Set a Datadog ingestion pipeline parser
+
+`autoFilledRule1 Marking\s+task\s+as\s+%{word:dag_status}.\s+%{data::keyvalue("=","*,")}`
+```json
+{
+  "dag_status": "SUCCESS",
+  "dag_id": "example_bash_operator",
+  "task_id": "run_after_loop",
+  "execution_date": "20210419T171919",
+  "start_date": "20210419T171923",
+  "end_date": "20210419T171924"
+}
+```
+
+> Parse the Task log
+
+`Running: ['airflow', 'tasks', 'run', 'example_bash_operator', '*', '2021-04-19T17:19:19.415224+00:00', '--job-id', '[171]', '--pool', 'default_pool', '--raw', '--subdir', '/home/airflow/.local/lib/python3.6/site-packages/airflow/example_dags/example_bash_operator.py', '--cfg-path', '/tmp/* '--error-file', '/tmp/*]`
+
+> Set a Datadog ingestion pipeline parser
+
+`autoFilledRule2 Running\:\s+\[\'%{word:process}\',\s+\'%{word:task_type}\',\s+\'%{word:dag_exec}\',\s+\'%{word:dag_id}\',\s+\'\*\',\s+\'%{date("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZ"):date}\',\s+\'--job-id\',\s+\'\[%{number:job_id}\]\', '--pool', '%{data:pool}',\s+\'--raw\',\s+\'--subdir\',\s+\'%{data:dag_file}\',\s+\'--cfg-path\',\s+\'/tmp/\*\s+\'--error-file\',\s+\'/tmp/\*\]`
+
+```json
+{
+  "pool": "default_pool",
+  "dag_file": "/home/airflow/.local/lib/python3.6/site-packages/airflow/example_dags/example_bash_operator.py",
+  "process": "airflow",
+  "task_type": "tasks",
+  "dag_exec": "run",
+  "dag_id": "example_bash_operator",
+  "date": 1618852759415,
+  "job_id": 171
+}
+```
+
+After logs are parsed and show up in the log explorer, create facets on the tags you need. 
+
+```json
+{
+dag_id
+dag_status
+end_date
+execution_date
+start_date
+task_id
+timestamp
+}
+```
