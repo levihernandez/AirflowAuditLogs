@@ -46,7 +46,7 @@ Restart Airflow to apply changes. Next we will register the new log collection w
 
 ### Datadog Airflow Configuration
 
-The [Datadog Airflow](https://app.datadoghq.com/account/settings#integrations/airflow) integration suggest the capture of the dag_processor_manager.log and scheduler logs. We are adding the triggered DAG logs below:
+The [Datadog Airflow](https://docs.datadoghq.com/integrations/airflow/?tab=host) integration suggest the capture of the dag_processor_manager.log and scheduler logs. We are adding the triggered DAG logs below:
 
 
 ```yaml
